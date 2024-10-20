@@ -1,0 +1,74 @@
+name: Test
+on:
+  # Run after the build workflow completes
+  workflow_run:
+    workflows: ["Build"]
+    types: [completed]
+  workflow_dispatch:
+concurrency:
+  group: ci-${{ github.workflow }}
+env:
+  MSBUILD_CACHES: |
+    **/dist/**/Reference
+    **/bin
+    **/obj
+  NUGET_CACHES: |
+    ~/.nuget/packages
+jobs:
+  test:
+    # if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: windows-latest
+    name: "Test Runner"
+    steps:
+      - name: Checkout latest repository commit
+        uses: actions/checkout@v4
+        with:
+          show-progress: false
+          fetch-depth: 0 # Disable shallow clone for Nerdbank.GitVersioning
+
+      # Setup the .NET environment
+      - name: Install .NET Core
+        uses: actions/setup-dotnet@v4
+      - run: dotnet --version
+      - name: Restore .NET tools
+        run: dotnet tool restore
+
+      # Setup MSBuild environment
+      - name: Restore Build Cache
+        id: msbuild-cache
+        uses: actions/cache@v3
+        with:
+          path: ${{ env.MSBUILD_CACHES }}
+          key: ${{ runner.os }}-msbuild-${{ github.ref_name }}-${{ github.sha }}
+
+      # Setup NuGet environment
+      - name: Setup NuGet
+        uses: NuGet/setup-nuget@v1.2.0
+      - name: Restore NuGet Cache
+        id: nuget-cache
+        uses: actions/cache@v3
+        with:
+          path: ${{ env.NUGET_CACHES }}
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
+
+      # Create .env file from GitHub secrets for integration tests.
+      - name: Create .env file
+        run: |
+          echo "USERNAME=${{ secrets.USERNAME }}" > .env
+          echo "PASSWORD=${{ secrets.PASSWORD }}" >> .env
+
+      # Run the test suite
+      - name: Run tests
+        run: dotnet test SDK.sln --no-build -v normal -clp:NoSummary
+
+      # Capture a screenshot of the test results
+      - name: Capture Desktop Screenshot
+        if: ${{ always() }}
+        uses: OrbitalOwen/desktop-screenshot-action@0.1
+        with:
+          file-name: test-results.png
+      - name: Upload Desktop Screenshot
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          path: test-results.png
