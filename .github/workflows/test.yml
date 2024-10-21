@@ -51,6 +51,11 @@ jobs:
           path: ${{ env.NUGET_CACHES }}
           key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
 
+      - name: Interactive User Session Test
+        shell: powershell
+        run: |
+          Start-Process 'C:\windows\system32\notepad.exe'
+
       # Create .env file from GitHub secrets for integration tests.
       - name: Create .env file
         run: |
