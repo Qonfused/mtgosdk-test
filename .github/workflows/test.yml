@@ -54,7 +54,7 @@ jobs:
       - name: Interactive User Session Test
         shell: powershell
         run: |
-          Start-Process 'C:\windows\system32\notepad.exe'
+          rundll32 dfshim.dll,ShOpenVerbApplication http://mtgo.patch.daybreakgames.com/patch/mtg/live/client/MTGO.application
 
       # Create .env file from GitHub secrets for integration tests.
       - name: Create .env file
