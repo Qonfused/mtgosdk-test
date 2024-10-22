@@ -5,7 +5,7 @@
     <!-- Enable central package management -->
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
     <!-- Enable deterministic NuGet package restore -->
-    <RestoreLockedMode>true</RestoreLockedMode>
+    <!-- <RestoreLockedMode>true</RestoreLockedMode> -->
     <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
     <RestoreUseStaticGraphEvaluation>true</RestoreUseStaticGraphEvaluation>
   </PropertyGroup>
@@ -54,6 +54,8 @@
     <!-- MTGOSDK.Win32 -->
     <PackageVersion Include="Microsoft.Win32.Registry"
                     Version="5.0.0" />
+    <PackageVersion Include="FrameworkExtract.System.Deployment"
+                    Version="4.0.30319" />
     <PackageVersion Include="Iced"
                     Version="1.21.0" />
     <!-- MTGOSDK.Tests -->
