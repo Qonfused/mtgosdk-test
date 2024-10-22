@@ -1,0 +1,41 @@
+name: Launch
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: windows-latest
+    name: "Test Runner"
+    steps:
+      - name: Checkout latest repository commit
+        uses: actions/checkout@v4
+        with:
+          show-progress: false
+          fetch-depth: 0 # Disable shallow clone for Nerdbank.GitVersioning
+
+      - name: Install MTGO
+        shell: pwsh
+        run: |
+          .\MTGOSDK\lib\Launcher\dist\Launcher.exe http://mtgo.patch.daybreakgames.com/patch/mtg/live/client/MTGO.application
+      - run: ls ~/Desktop
+      - name: Launch MTGO
+        shell: pwsh
+        run: |
+          Start-Process "C:\Windows\Microsoft.NET\Framework\v4.0.30319\dfsvc.exe"
+          Start-Process "C:\Users\runneradmin\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Daybreak Game Company LLC\magic The Gathering Online .appref-ms"
+      #- shell: pwsh
+      #  run: Start-Process "~\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Daybreak Game Company LLC\magic The Gathering Online .appref-ms"
+      - run: ping 127.0.0.1 -n 31 > nul
+      - run: |
+          Get-Process -Name MTGO* | ft * -auto
+
+      # Capture a screenshot of the test results
+      - name: Capture Desktop Screenshot
+        if: ${{ always() }}
+        uses: OrbitalOwen/desktop-screenshot-action@0.1
+        with:
+          file-name: test-results.png
+      - name: Upload Desktop Screenshot
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          path: test-results.png

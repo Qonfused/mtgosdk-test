@@ -31,6 +31,16 @@ public static class ClickOncePaths
     @"SOFTWARE\Classes\Software\Microsoft\Windows\CurrentVersion\Deployment\SideBySide\2.0\StateManager";
 
   /// <summary>
+  /// The path to the ClickOnce service executable.
+  /// </summary>
+  /// <remarks>
+  /// This is the executable that is used to launch and install ClickOnce
+  /// applications. It handles redirects from .application and .appref-ms files.
+  /// </remarks>
+  public const string ClickOnceServiceExecutable =
+    @"C:\Windows\Microsoft.NET\Framework\v4.0.30319\dfsvc.exe";
+
+  /// <summary>
   /// The application directory for ClickOnce deployments.
   /// </summary>
   public static string ApplicationDirectory = Path.Combine(

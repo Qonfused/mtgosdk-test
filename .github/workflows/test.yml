@@ -51,11 +51,6 @@ jobs:
           path: ${{ env.NUGET_CACHES }}
           key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
 
-      - name: Interactive User Session Test
-        shell: powershell
-        run: |
-          rundll32 dfshim.dll,ShOpenVerbApplication http://mtgo.patch.daybreakgames.com/patch/mtg/live/client/MTGO.application
-
       # Create .env file from GitHub secrets for integration tests.
       - name: Create .env file
         run: |
@@ -65,6 +60,11 @@ jobs:
       # Run the test suite
       - name: Run tests
         run: dotnet test SDK.sln --no-build -v normal -clp:NoSummary
+
+      - name: List MTGO processes
+        if: ${{ always() }}
+        run: |
+          Get-Process -Name MTGO* | ft * -auto
 
       # Capture a screenshot of the test results
       - name: Capture Desktop Screenshot
