@@ -51,17 +51,12 @@ jobs:
           path: ${{ env.NUGET_CACHES }}
           key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
 
-      # Create .env file and restore MTGO game history for integration tests
+      # Create .env file from GitHub secrets for integration tests
       - name: Create .env file
         run: |
           echo "USERNAME=${{ secrets.USERNAME }}" > .env
           echo "PASSWORD=${{ secrets.PASSWORD }}" >> .env
-      - name: Restore MTGO game history
-        shell: pwsh
-        run: |
-          .\.github\scripts\restore-game-history.ps1 `
-            -username ${{ secrets.USERNAME }} `
-            -filepath .\.github\scripts\mtgo_game_history
+          echo "GAME_HISTORY_FILE=.\.github\scripts\mtgo_game_history" >> .env
 
       # Run the test suite
       - name: Run tests

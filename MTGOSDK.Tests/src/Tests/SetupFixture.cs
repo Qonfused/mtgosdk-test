@@ -3,11 +3,13 @@
   SPDX-License-Identifier: Apache-2.0
 **/
 
+using System.IO;
 using System.Threading.Tasks;
 
 using Microsoft.Extensions.Logging;
 
 using MTGOSDK.API;
+using MTGOSDK.API.Play.History;
 using MTGOSDK.Core.Reflection;
 using MTGOSDK.Core.Remoting;
 using MTGOSDK.Core.Security;
@@ -74,6 +76,14 @@ public class SetupFixture : DLRWrapper<Client>
 
       // Revalidate the client's reported interactive state.
       Assert.That(Client.IsInteractive, Is.False);
+    }
+
+    // Restore any game history previously saved to the file system.
+    if (Try(() => DotEnv.Get("GAME_HISTORY_FILE")) is string gameHistoryFile)
+    {
+      // Load the game history file if it exists.
+      if (File.Exists(gameHistoryFile))
+        HistoryManager.MergeGameHistory(gameHistoryFile);
     }
 
     client.ClearCaches();
