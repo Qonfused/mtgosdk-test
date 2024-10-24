@@ -27,7 +27,7 @@ using static MTGOSDK.Resources.EmbeddedResources;
 /// <summary>
 /// A singleton class that manages the connection to the MTGO client process.
 /// </summary>
-public sealed class RemoteClient : DLRWrapper<dynamic>
+public sealed class RemoteClient : DLRWrapper
 {
   //
   // Singleton instance and static accessors
@@ -237,6 +237,9 @@ public sealed class RemoteClient : DLRWrapper<dynamic>
       if (!string.IsNullOrEmpty(MTGOProcess().MainWindowTitle))
         throw new SetupFailureException("Failed to start the MTGO process.");
     }
+
+    // Wait for the process to be ready to accept input before returning.
+    MTGOProcess().WaitForInputIdle();
   }
 
   /// <summary>
