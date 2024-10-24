@@ -51,29 +51,35 @@ jobs:
           path: ${{ env.NUGET_CACHES }}
           key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
 
-      # Create .env file from GitHub secrets for integration tests.
+      # Create .env file and restore MTGO game history for integration tests
       - name: Create .env file
         run: |
           echo "USERNAME=${{ secrets.USERNAME }}" > .env
           echo "PASSWORD=${{ secrets.PASSWORD }}" >> .env
+      - name: Restore MTGO game history
+        shell: pwsh
+        run: |
+          .\.github\scripts\restore-mtgo-history.ps1 `
+            -username ${{ secrets.USERNAME }} `
+            -filepath .\.github\scripts\mtgo_game_history
 
       # Run the test suite
       - name: Run tests
         run: dotnet test SDK.sln --no-build -v normal -clp:NoSummary
 
       - name: List MTGO processes
-        if: ${{ always() }}
+        if: ${{ failure() }}
         run: |
           Get-Process -Name MTGO* | ft * -auto
 
       # Capture a screenshot of the test results
       - name: Capture Desktop Screenshot
-        if: ${{ always() }}
+        if: ${{ failure() }}
         uses: OrbitalOwen/desktop-screenshot-action@0.1
         with:
           file-name: test-results.png
       - name: Upload Desktop Screenshot
-        if: ${{ always() }}
+        if: ${{ failure() }}
         uses: actions/upload-artifact@v4
         with:
           path: test-results.png
