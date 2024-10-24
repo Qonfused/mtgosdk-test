@@ -59,7 +59,7 @@ jobs:
       - name: Restore MTGO game history
         shell: pwsh
         run: |
-          .\.github\scripts\restore-mtgo-history.ps1 `
+          .\.github\scripts\restore-game-history.ps1 `
             -username ${{ secrets.USERNAME }} `
             -filepath .\.github\scripts\mtgo_game_history
 
