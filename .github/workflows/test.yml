@@ -78,3 +78,12 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           path: test-results.png
+
+      - name: Display Diver Logs
+        if: ${{ failure() }}
+        run: |
+          Get-Content C:\Users\runneradmin\AppData\Local\MTGOSDK\Logs\*.log
+      - name: Upload Diver logs
+        uses: actions/upload-artifact@v4
+        with:
+          path: C:\Users\runneradmin\AppData\Local\MTGOSDK\Logs\
